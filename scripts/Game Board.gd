@@ -10,12 +10,7 @@ var board_grid = []
 var placeholder_textures = [
 	preload("res://images/place_holder.png"),
 	preload("res://images/empty.png")]
-var sun_moon_textures = [
-	preload("res://images/sun.png"),
-	preload("res://images/moon.png")]
-var xo_textures = [
-	preload("res://images/x.png"),
-	preload("res://images/o.png")]
+var player_piece_textures = []
 var player_avatar = [
 	preload("res://images/human.png"),
 	preload("res://images/cpu.png")]
@@ -25,12 +20,11 @@ var board_grid_textures = [
 	preload("res://images/board_grid_5x5.png")]
 
 func init_board():
-	var singleton = $"/root/main"
 	
-	game_type = singleton.game_type_choice
-	icon_Set = singleton.icon_set_choice
+	game_type = main.game_type_choice
+	icon_Set = main.icon_set_choice
 	
-	set_player_type(singleton)
+	set_player_type(main)
 	add_cells(game_type)
 	board_grid.resize(pow(game_type, 2))
 	empty_board()	
@@ -75,6 +69,22 @@ func set_player_type(singleton):
 	else:
 		$"VBoxContainer/Score board/HBoxContainer/Player1/Player1 avatar".texture = player_avatar[0]
 		$"VBoxContainer/Score board/HBoxContainer/Player2/Player2 avatar".texture = player_avatar[1]
+
+func cpu_player():
+	$"Player_input disabler".visible = true
+	yield(get_tree().create_timer(1.0), "timeout")
+	var mouse_click = InputEventMouseButton.new()
+	var random_cell :int
+	
+	mouse_click.button_index = BUTTON_LEFT
+	for i in INF:
+		random_cell = rand_range(0.0, pow(game_type, 2)) as int
+		if board_grid[random_cell] == 0:
+			board_grid[random_cell] = turn
+			if !check_winner():
+				check_turn(random_cell as String)
+			$"Player_input disabler".visible = false
+			break
 
 func win() -> bool:
 	var win = false
@@ -136,7 +146,7 @@ func draw() -> bool:
 	else:
 		return false
 
-func check_winner():
+func check_winner() -> bool:
 	var winner
 	if win():
 		if turn == player.ONE:
@@ -144,7 +154,7 @@ func check_winner():
 			score[0] += 1
 			$"VBoxContainer/Score board/HBoxContainer/Player1/Player1 score".text = score[0] as String
 		else:
-			if $"/root/main".player_type_choice == $"/root/main".player_type.PVP:
+			if main.player_type_choice == main.player_type.PVP:
 				winner = "Player two Won"
 			else:
 				winner = "Computer won"
@@ -154,13 +164,16 @@ func check_winner():
 		print(winner)
 		$"Game popup".visible = true
 		total_turns = 0
+		return true
 	elif draw():
 		winner = "Draw"
 		$"Game popup/Background color/MarginContainer/VBoxContainer/Winner center/Winner".text = winner
 		$"Game popup".visible = true
 		total_turns = 0
+		return true
 	else:
 		total_turns += 1
+	return false
 
 func empty_board():
 	for i in board_grid.size():
@@ -174,13 +187,21 @@ func reset_board():
 func check_turn(cell):
 	if turn == player.ONE:
 		turn = player.TWO
-		change_player_piece(cell, sun_moon_textures[0])
+		change_player_piece(cell, player_piece_textures[0])
 	else:
 		turn = player.ONE
-		change_player_piece(cell, sun_moon_textures[1])
+		change_player_piece(cell, player_piece_textures[1])
 
 func _ready():
 	init_board()
+	if main.icon_set_choice == main.icon_set.XO:
+		player_piece_textures = [
+			preload("res://images/x.png"),
+			preload("res://images/o.png")]
+	else:
+		player_piece_textures = [
+			preload("res://images/sun.png"),
+			preload("res://images/moon.png")]
 	if $"/root/Game/Background/Game Board/Pause menu/MarginContainer/VBoxContainer/Continue center/Continue".connect("pressed", self, "_on_continue_pressed") != OK:
 		print("Unable to connect Continue signal!")
 	if $"/root/Game/Background/Game Board/Pause menu/MarginContainer/VBoxContainer/Exit center/Exit".connect("pressed", self, "_on_exit_pressed") != OK:
@@ -190,10 +211,12 @@ func _on_cell_pressed(event, cell):
 	var current_cell = parse_cell_position(cell)
 	if event is InputEventMouseButton:
 		if event.button_index == BUTTON_LEFT and event.pressed:
-			board_grid[current_cell] = turn
-			check_winner()
-			check_turn(cell)
-			
+			if board_grid[current_cell] == 0:
+				board_grid[current_cell] = turn
+				if !check_winner():
+					check_turn(cell)
+					if main.player_type_choice == main.player_type.PVC and turn == player.TWO:
+						cpu_player()
 
 func _on_Pause_button_pressed():
 	visible = false
@@ -207,7 +230,7 @@ func _on_continue_pressed():
 
 func _on_exit_pressed():
 	get_tree().paused = false
-	$"/root/main".goto_scene("res://scenes/ui/Main menu.tscn")
+	main.goto_scene("res://scenes/ui/Main menu.tscn", 1.0)
 
 func _on_Retry_pressed():
 	reset_board()
@@ -222,4 +245,3 @@ func _on_New_game_pressed():
 	$"VBoxContainer/Score board/HBoxContainer/Player1/Player1 score".text = 0 as String
 	$"VBoxContainer/Score board/HBoxContainer/Player2/Player2 score".text = 0 as String
 	$"Game popup".visible = false
-	

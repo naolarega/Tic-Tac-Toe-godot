@@ -2,11 +2,11 @@ extends Control
 
 
 func goto_game(player_type):
-	$"/root/main".player_type_choice = player_type
-	$"/root/main".goto_scene("res://scenes/Game.tscn")
+	main.player_type_choice = player_type
+	main.goto_scene("res://scenes/Game.tscn", 0.0)
 
 func _on_PvP_pressed():
-	goto_game($"/root/main".player_type.PVP)
+	goto_game(main.player_type.PVP)
 
 func _on_PvC_pressed():
-	goto_game($"/root/main".player_type.PVC)
+	goto_game(main.player_type.PVC)

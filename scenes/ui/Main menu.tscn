@@ -16,10 +16,10 @@
 [ext_resource path="res://images/iconset_sun_moon.png" type="Texture" id=14]
 [ext_resource path="res://images/4by4.png" type="Texture" id=15]
 [ext_resource path="res://images/icon_sets.png" type="Texture" id=16]
-[ext_resource path="res://images/3by3.png" type="Texture" id=17]
+[ext_resource path="res://images/3by3_selection.png" type="Texture" id=17]
 [ext_resource path="res://images/5by5.png" type="Texture" id=18]
 [ext_resource path="res://images/difficulty.png" type="Texture" id=19]
-[ext_resource path="res://images/iconset_xo.png" type="Texture" id=20]
+[ext_resource path="res://images/iconset_xo-selection.png" type="Texture" id=20]
 
 [sub_resource type="Animation" id=1]
 resource_name = "Title pulsate"

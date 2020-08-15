@@ -208,6 +208,16 @@ margin_bottom = 64.0
 texture_normal = ExtResource( 9 )
 texture_pressed = ExtResource( 12 )
 
+[node name="Player_input disabler" type="ColorRect" parent="Game Board Margin"]
+visible = false
+margin_left = 20.0
+margin_top = 20.0
+margin_right = 1004.0
+margin_bottom = 580.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+color = Color( 1, 1, 1, 0 )
+
 [node name="Pause menu" parent="." instance=ExtResource( 5 )]
 visible = false
 [connection signal="pressed" from="Game Board Margin/VBoxContainer/HBoxContainer/Pause button" to="Game Board Margin" method="_on_Pause_button_pressed"]
